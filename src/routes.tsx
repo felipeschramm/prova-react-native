@@ -1,5 +1,5 @@
 import React from "react";
-import {Image} from "react-native";
+import { Image } from "react-native";
 
 import Auth from "./pages/Auth";
 import Register from "./pages/Register";
@@ -17,13 +17,16 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
-const DrawerScreen=()=>{
-    return(
-        <Drawer.Navigator drawerPosition='right' drawerContent={(props)=> <Cart {...props}/>}> 
-            <Drawer.Screen name='NewBet' component={NewBet}/>
-        </Drawer.Navigator>
-    )
-}
+const DrawerScreen = () => {
+  return (
+    <Drawer.Navigator
+      drawerPosition="right"
+      drawerContent={(props) => <Cart {...props} />}
+    >
+      <Drawer.Screen name="NewBet" component={NewBet} />
+    </Drawer.Navigator>
+  );
+};
 
 const TabsScreen = () => (
   <Tab.Navigator
@@ -106,14 +109,30 @@ const TabsScreen = () => (
     }}
   >
     <Tab.Screen name="Home" component={Home} />
-    <Tab.Screen name="Drawer" component={DrawerScreen} options={() => (
-          {
-            tabBarIcon: () => (
-              <View style={{paddingLeft:4,width:92, height:92, borderRadius:100, borderWidth:5, borderColor:'#fff', alignItems:'center', justifyContent:'center', backgroundColor:'#B5C300'}}>
-                  <Ionicons name={'logo-usd'} size={60} color={'#fff'} />
-              </View>
-            ), tabBarLabel: ''
-          })} />
+    <Tab.Screen
+      name="Drawer"
+      component={DrawerScreen}
+      options={() => ({
+        tabBarIcon: () => (
+          <View
+            style={{
+              paddingLeft: 4,
+              width: 92,
+              height: 92,
+              borderRadius: 100,
+              borderWidth: 7,
+              borderColor: "#fff",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#B5C300",
+            }}
+          >
+            <Ionicons name={"logo-usd"} size={60} color={"#fff"} />
+          </View>
+        ),
+        tabBarLabel: "",
+      })}
+    />
     <Tab.Screen name="Account" component={Account} />
   </Tab.Navigator>
 );

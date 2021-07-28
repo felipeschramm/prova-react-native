@@ -1,23 +1,45 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Text, TouchableOpacity, View, StyleSheet, ToastAndroid } from "react-native";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  ToastAndroid,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { TextInput } from "react-native-gesture-handler";
 import { register } from "../../store/User/userSlice";
 import { RootState } from "../../store";
 import { login } from "../../store/User/userSlice";
+import axios from "axios";
 
 const AuthPage: React.FC<{ navigation: any }> = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.user);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const loginHandler = () => {
-    if (email === user.email) {
-      navigation.navigate("App");
-    }else{
-      ToastAndroid.showWithGravityAndOffset('User not registered',ToastAndroid.SHORT,ToastAndroid.BOTTOM, 25,50)
-    }
+  const loginHandler = async () => {
+    await axios
+      .post("http://localhost:3333/sessions", {
+        email:'felipecschramm@hotmail.com',
+        password: 'felipe123',
+      })
+      ///////////////////////arrumar emsil:email, password:password
+      .then((resp) => {
+        dispatch(login({ token: resp.data.token.toString() }));
+        navigation.navigate("App");
+      })
+      .catch((err) => {
+        // return ToastAndroid.showWithGravityAndOffset(
+        //   "User not registered",
+        //   ToastAndroid.SHORT,
+        //   ToastAndroid.BOTTOM,
+        //   25,
+        //   50
+        // );
+      });
   };
 
   return (
@@ -71,6 +93,7 @@ const AuthPage: React.FC<{ navigation: any }> = ({ navigation }) => {
             }}
           />
           <TextInput
+            onChangeText={(input) => setPassword(input)}
             placeholder="Password"
             style={{
               height: 70,

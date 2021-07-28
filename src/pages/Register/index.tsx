@@ -10,28 +10,50 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { TextInput } from "react-native-gesture-handler";
-import { register } from "../../store/User/userSlice";
+import axios from "axios";
 
 const RegisterPage: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const registerHandler = async () => {
-    if (email !== "" && password !== "" && name !== "") {
-      await dispatch(
-        register({ email: email, password: password, name: name })
-      );
-      navigation.navigate("Auth");
+    if (name.trim() !== "" && email.trim() !== "" && password.trim() !== "") {
+      await axios
+        .post("http://127.0.0.1:3333/users", {
+          username: name,
+          email: email,
+          password: password,
+        })
+        .then(() => {
+          setName("");
+          setEmail("");
+          setPassword("");
+          // ToastAndroid.showWithGravityAndOffset(
+          //   "User created. Go back to login page",
+          //   ToastAndroid.SHORT,
+          //   ToastAndroid.BOTTOM,
+          //   25,
+          //   50
+          // );
+        })
+        .catch((err) => {
+          // ToastAndroid.showWithGravityAndOffset(
+          //   "Try again",
+          //   ToastAndroid.SHORT,
+          //   ToastAndroid.BOTTOM,
+          //   25,
+          //   50
+          // );
+        });
     } else {
-      ToastAndroid.showWithGravityAndOffset(
-        "Fill all the blanks",
-        ToastAndroid.SHORT,
-        ToastAndroid.BOTTOM,
-        25,
-        50
-      );
+      // ToastAndroid.showWithGravityAndOffset(
+      //   "Fill all the blanks",
+      //   ToastAndroid.SHORT,
+      //   ToastAndroid.BOTTOM,
+      //   25,
+      //   50
+      // );
     }
   };
 
@@ -101,6 +123,7 @@ const RegisterPage: React.FC<{ navigation: any }> = ({ navigation }) => {
             }}
           />
           <TextInput
+            value={password}
             secureTextEntry
             onChangeText={(input) => setPassword(input)}
             placeholder="Password"
