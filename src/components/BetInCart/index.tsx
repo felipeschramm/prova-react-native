@@ -1,8 +1,6 @@
 import React from "react";
 import { Feather } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
-import { removeGame } from "../../store/Cart/cartSlice";
-import { removeGameCart } from "../../store/InfoCart/infoCartSlice";
 import { Game } from "../../store/Games/gamesSlice";
 import {
   Container,
@@ -13,6 +11,8 @@ import {
 } from "./styles";
 import { TouchableOpacity, View } from "react-native";
 import moment from "moment";
+import { removeGame } from "../../store/Cart/cartSlice";
+import { removeGameCart } from "../../store/InfoCart/infoCartSlice";
 
 const BetInCart: React.FC<{
   game: Game;
@@ -45,8 +45,9 @@ const BetInCart: React.FC<{
               size={15}
               color={"#707070"}
               onClick={() => {
+                console.log('oi')
                 dispatch(removeGame(game.index));
-                dispatch(removeGameCart(game.price));
+                dispatch(removeGameCart(game.price))
               }}
             />
           </TouchableOpacity>

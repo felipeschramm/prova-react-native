@@ -1,4 +1,5 @@
 import React from "react";
+import { Text } from "react-native";
 import { ContainerBettingNumbers } from "./styles";
 
 const BettingNumbers: React.FunctionComponent<{
@@ -9,10 +10,12 @@ const BettingNumbers: React.FunctionComponent<{
 }> = ({ numberButton, colorButton, onClick, isClicked }) => {
   return (
     <ContainerBettingNumbers
-      onClick={onClick}
+      onPress={onClick}
       colorBtn={isClicked ? colorButton : "#ADC0C4"}
     >
-      {numberButton<10? '0'+numberButton : numberButton}
+      <Text style={{ fontSize: 20, color: "white" }}>
+        {numberButton < 10 ? "0" + numberButton : numberButton}
+      </Text>
     </ContainerBettingNumbers>
   );
 };

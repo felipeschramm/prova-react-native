@@ -30,19 +30,21 @@ export const LineColor = styled.View`
 `;
 
 export const NumbersTextStyle = styled.Text`
-  font: italic normal bold 12px Helvetica Neue;
+  font-size: 12px;
+  font-weight:bold;
   color: #868686;
   font-weight: bold
 `;
 
 export const TypeTextStyle = styled.Text`
   width: 100%;
-  font: italic normal bold 16px Helvetica Neue;
+  font-size:16px;
+  font-weight:bold;
   color: ${(props: PropsType) => props.color};
 `;
 
 export const PriceText = styled.Text`
-  font: normal normal normal 12px Helvetica Neue;
+  font-size:12px;
   color: #868686;
   margin-bottom: 7px;
 `;

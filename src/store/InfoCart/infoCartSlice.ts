@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-let initialCart = {
+let initialState = {
   totalPrice: 0,
   totalQtt: 0,
 };
 
 const infoCart = createSlice({
-  name: "cart",
-  initialState: initialCart,
+  name: "infoCart",
+  initialState,
   reducers: {
     addGameCart(state, action: PayloadAction<number>) {
       state.totalPrice += action.payload;

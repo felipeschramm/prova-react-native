@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Account from "./pages/Account";
 import NewBet from "./pages/NewBet";
 import Cart from "./components/Cart";
+import Reset from "./pages/Reset";
 
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -94,6 +95,7 @@ const TabsScreen = () => (
       activeTintColor: "black",
       inactiveTintColor: "#969696",
       style: {
+        borderTopWidth: 0,
         borderTopLeftRadius: 15,
         borderTopRightRadius: 15,
         backgroundColor: "white",
@@ -125,6 +127,7 @@ const TabsScreen = () => (
               alignItems: "center",
               justifyContent: "center",
               backgroundColor: "#B5C300",
+              marginBottom: 5,
             }}
           >
             <Ionicons name={"logo-usd"} size={60} color={"#fff"} />
@@ -148,6 +151,11 @@ function Routes() {
       <Stack.Screen
         name="Register"
         component={Register}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Reset"
+        component={Reset}
         options={{ headerShown: false }}
       />
       <Stack.Screen

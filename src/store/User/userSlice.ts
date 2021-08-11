@@ -1,15 +1,24 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-// import { AppDispatch, AppThunk } from "..";
+
+interface UserState {
+  isAuthenticated: boolean;
+  email: string;
+  password: string;
+  name: string;
+  token: string;
+}
+
+const initialState: UserState = {
+  isAuthenticated: false,
+  email: "",
+  password: "",
+  name: "",
+  token: "",
+};
 
 const user = createSlice({
   name: "user",
-  initialState: {
-    isAuthenticated: false,
-    email: "",
-    password: "",
-    name: "",
-    token: "",
-  },
+  initialState,
   reducers: {
     login(state, action: PayloadAction<{ token: string }>) {
       state.isAuthenticated = true;

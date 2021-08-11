@@ -1,39 +1,43 @@
-import styled from "styled-components";
+import { Text } from "react-native";
+import { View } from "react-native";
+import styled from "styled-components/native";
 
 interface Props {
   color: string;
 }
 
-export const Container = styled.div`
+export const Container = styled(View)`
   width: 100%;
   height: auto;
-  padding-right: 10%;
-  padding-top: 20px;
   display: flex;
-  flexdirection: row;
+  flex-direction: row;
+  margin-bottom: 5px;
+  margin-top: 10px;
 `;
-export const LineColor = styled.div`
+export const LineColor = styled(View)`
   width: 6px;
-  height: 94px;
+  height: 100%;
   background-color: ${(props: Props) => props.color};
   border-radius: 100px;
 `;
-export const DivInfo = styled.div`
+export const DivInfo = styled(View)`
   margin-left: 15px;
 `;
-export const InfoBet = styled.div`
-  font: normal normal normal 17px Helvetica Neue;
+export const InfoBet = styled(Text)`
+  font-size: 12px;
   color: #868686;
-  margin-bottom: 11px;
+  margin-bottom: 7px;
 `;
 
-export const NameBet = styled.div`
-  font: italic normal bold 20px Helvetica Neue;
+export const NameBet = styled(Text)`
+  font-size: 16px;
+  font-weight: bold;
   color: ${(props: Props) => props.color};
 `;
 
-export const NumbersBet = styled.div`
-  font: italic normal bold 20px Helvetica Neue;
+export const NumbersBet = styled(Text)`
+  font-size: 12px;
+  font-weight: bold;
   color: #868686;
-  margin-bottom: 15px;
+  margin-bottom: 7px;
 `;

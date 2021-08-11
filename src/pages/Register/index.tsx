@@ -9,13 +9,15 @@ import {
   ToastAndroid,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { TextInput } from "react-native-gesture-handler";
 import axios from "axios";
+import { InputText, LineColor, ViewForm } from "./styles";
+import { register } from "../../store/User/userSlice";
 
 const RegisterPage: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch()
 
   const registerHandler = async () => {
     if (name.trim() !== "" && email.trim() !== "" && password.trim() !== "") {
@@ -25,35 +27,36 @@ const RegisterPage: React.FC<{ navigation: any }> = ({ navigation }) => {
           email: email,
           password: password,
         })
-        .then(() => {
+        .then(async() => {
           setName("");
           setEmail("");
           setPassword("");
-          // ToastAndroid.showWithGravityAndOffset(
-          //   "User created. Go back to login page",
-          //   ToastAndroid.SHORT,
-          //   ToastAndroid.BOTTOM,
-          //   25,
-          //   50
-          // );
+          await dispatch(register({email:email, password:password, name:name}))
+          ToastAndroid.showWithGravityAndOffset(
+            "User created. Go back to login page",
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            25,
+            50
+          );
         })
         .catch((err) => {
-          // ToastAndroid.showWithGravityAndOffset(
-          //   "Try again",
-          //   ToastAndroid.SHORT,
-          //   ToastAndroid.BOTTOM,
-          //   25,
-          //   50
-          // );
+          ToastAndroid.showWithGravityAndOffset(
+            "Try again",
+            ToastAndroid.SHORT,
+            ToastAndroid.BOTTOM,
+            25,
+            50
+          );
         });
     } else {
-      // ToastAndroid.showWithGravityAndOffset(
-      //   "Fill all the blanks",
-      //   ToastAndroid.SHORT,
-      //   ToastAndroid.BOTTOM,
-      //   25,
-      //   50
-      // );
+      ToastAndroid.showWithGravityAndOffset(
+        "Fill all the blanks",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50
+      );
     }
   };
 
@@ -71,71 +74,27 @@ const RegisterPage: React.FC<{ navigation: any }> = ({ navigation }) => {
           >
             TGL
           </Text>
-          <View
-            style={{
-              width: 107,
-              height: 7,
-              backgroundColor: "#B5C401",
-              borderRadius: 6,
-              marginBottom: 46,
-            }}
-          />
+          <LineColor />
         </View>
         <Text style={[styles.greyTitle, { marginBottom: 26 }]}>
           Registration
         </Text>
-        <View
-          style={{
-            width: 306,
-            height: 293,
-            marginBottom: 38,
-            borderWidth: 1,
-            borderColor: "#DDDDDD",
-            borderRadius: 15,
-          }}
-        >
-          <TextInput
+        <ViewForm>
+          <InputText
             value={name}
             onChangeText={(input) => setName(input)}
             placeholder="Username"
-            style={{
-              height: 70,
-              fontSize: 15,
-              color: "#9D9D9D",
-              borderBottomColor: "#EBEBEB",
-              borderBottomWidth: 1,
-              paddingLeft: 26,
-              fontWeight: "bold",
-            }}
           />
-          <TextInput
+          <InputText
             value={email}
             onChangeText={(input) => setEmail(input)}
             placeholder="Email"
-            style={{
-              height: 70,
-              fontSize: 15,
-              color: "#9D9D9D",
-              borderBottomColor: "#EBEBEB",
-              borderBottomWidth: 1,
-              paddingLeft: 26,
-              fontWeight: "bold",
-            }}
           />
-          <TextInput
+          <InputText
             value={password}
             secureTextEntry
             onChangeText={(input) => setPassword(input)}
             placeholder="Password"
-            style={{
-              height: 70,
-              fontSize: 15,
-              color: "#9D9D9D",
-              borderBottomColor: "#EBEBEB",
-              borderBottomWidth: 1,
-              paddingLeft: 26,
-              fontWeight: "bold",
-            }}
           />
           <TouchableOpacity
             onPress={registerHandler}
@@ -145,7 +104,7 @@ const RegisterPage: React.FC<{ navigation: any }> = ({ navigation }) => {
               Register <Feather name="arrow-right" color="#B5C401" size={30} />
             </Text>
           </TouchableOpacity>
-        </View>
+        </ViewForm>
         <TouchableOpacity
           onPress={() => {
             navigation.replace("Auth");

@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Touchable,
-  TouchableOpacityBase,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, TouchableOpacity, ToastAndroid } from "react-native";
 import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import ButtonType from "../../components/ButtonType";
 import BettingNumbers from "../../components/BettingNumbers";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
-import { AddButton, BottomButton, BottomButtonsRow } from "./styles";
+import { ScrollView } from "react-native-gesture-handler";
+import {
+  AddButton,
+  BottomButton,
+  BottomButtonsRow,
+  Container,
+  TextButton,
+} from "./styles";
 import { addGame } from "../../store/Cart/cartSlice";
 import moment from "moment";
-import { addGameCart} from "../../store/InfoCart/infoCartSlice";
+import { Game } from "../../store/Games/gamesSlice";
+import { addGameCart } from "../../store/InfoCart/infoCartSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
 type game = {
   type: string;
@@ -39,16 +41,15 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     color: "",
     "min-cart-value": 0,
   });
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [totalQty, setTotalQty] = useState(0);
+  const dispatch = useAppDispatch();
   const [numbersSelected, setNumbersSelected] = useState<number[]>([]);
   const numbersSelect: Array<number> = numbersSelected;
   const [typesGames, setTypesGames] = useState<game[]>();
-  const token = useSelector((state: RootState) => state.user.token);
-  const gamesFromCart = useSelector((state: RootState) => state.cart);
+  const token = useAppSelector((state: RootState) => state.user.token);
+  const gamesFromCart: Game[] = useAppSelector((state) => state.cart.bets);
   useEffect(() => {
     axios
-      .get("http://localhost:3333/games", {
+      .get("http://192.168.0.100:3333/games", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -56,9 +57,7 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       .then((resp) => {
         setTypesGames(resp.data);
       });
-  }, []);
-
-  const dispatch = useDispatch();
+  }, [setTypesGames]);
 
   function defineType(type: string) {
     setType(type);
@@ -100,14 +99,26 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const clearGame = () => {
     if (numbersSelected.length === 0) {
-      // return toast.info("Game is already empty");
+      return ToastAndroid.showWithGravityAndOffset(
+        "Game is already empty",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50
+      );
     }
     setNumbersSelected([]);
   };
 
   const completeGame = () => {
     if (numbersSelected.length >= game["max-number"]) {
-      // return toast.info("Game is already completed");
+      return ToastAndroid.showWithGravityAndOffset(
+        "Game is already completed",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50
+      );
     }
 
     const left = game["max-number"] - numbersSelected.length;
@@ -134,39 +145,55 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     return resp;
   };
 
-  const addToCart = async() => {
+  async function dispatchGame(numbers) {
+    try {
+      const newBet: Game = {
+        index: new Date().toString(),
+        numbers: numbers,
+        date: moment().format("DD/MM/yyyy"),
+        price: Number(game.price.toFixed(2)),
+        type: game.type,
+        color: game.color,
+        "max-number": game["max-number"],
+      };
+      dispatch(addGame(newBet));
+      dispatch(addGameCart(newBet.price));
+      setNumbersSelected([]);
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  function addToCart() {
     const left = game["max-number"] - numbersSelected.length;
     if (numbersSelected.length !== game["max-number"]) {
       if (left === 1) {
-        return;
-        //toast.info("Select " + left + " more number");
+        return ToastAndroid.showWithGravityAndOffset(
+          "Add 1 more number",
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+          25,
+          50
+        );
       }
-      return;
-      //toast.info("Select " + left + " more numbers");
+      return ToastAndroid.showWithGravityAndOffset(
+        "Add " + left + " more numbers",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50
+      );
     } else {
       const formattedNumbers = formatNumbers(
         numbersSelected.sort((a, b) => a - b)
       );
-      await dispatch(
-        addGame({
-          index: new Date().toString(),
-          numbers: formattedNumbers,
-          date: moment().format("DD/MM/yyyy"),
-          price: Number(game.price.toFixed(2)),
-          type: game.type,
-          color: game.color,
-          "max-number": game["max-number"],
-        })
-      );
-      await dispatch(addGameCart(game.price))
-      // setTotalQty((prevState) => prevState + 1);
-      // setTotalPrice((prevState) => prevState + game.price);
-      setNumbersSelected([]);
+
+      dispatchGame(formattedNumbers);
     }
-  };
+  }
 
   return (
-    <View style={{ flex: 1, padding: 20, marginTop: 25 }}>
+    <Container>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <View>
           <Text
@@ -190,7 +217,7 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           />
         </View>
         <View style={{ flexDirection: "row" }}>
-          {(numbersSelect.length !== 0|| gamesFromCart.length!== 0) && (
+          {(numbersSelect.length !== 0 || gamesFromCart.length !== 0) && (
             <TouchableOpacity
               onPress={() => {
                 navigation.openDrawer();
@@ -210,6 +237,9 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             size={30}
             color="#C1C1C1"
             style={{ marginTop: 4 }}
+            onPress={() => {
+              navigation.replace("Auth");
+            }}
           />
         </View>
       </View>
@@ -222,12 +252,12 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         }}
       >
         NEW BET
-        {type && <span>{" FOR " + type.toUpperCase()}</span>}
+        {type && <Text>{" FOR " + type.toUpperCase()}</Text>}
       </Text>
       <Text style={{ fontSize: 17, color: "#868686", marginBottom: 20 }}>
         Choose a game
       </Text>
-      <View style={{ flexDirection: "row", marginBottom: 15 }}>
+      <View style={{ flexDirection: "row", marginBottom: 15, width: "100%" }}>
         {typesGames?.map((game, index) => {
           return (
             <ButtonType
@@ -246,10 +276,10 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           );
         })}
       </View>
-      {type && (
-        <ScrollView style={{ width: "100%" }}>
+      {type.length !== 0 && (
+        <ScrollView>
           {numbersSelected.length === 0 && (
-            <>
+            <View>
               <Text
                 style={{ color: "#868686", fontSize: 17, fontWeight: "bold" }}
               >
@@ -263,15 +293,16 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   marginBottom: 10,
                 }}
               >
-                {game?.description}
+                {game.description}
               </Text>
-            </>
+            </View>
           )}
           {numbersSelected.length !== 0 && (
-            <>
+            <View>
               <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-                {numbersSelected.map((item) => (
+                {numbersSelected.map((item, index) => (
                   <View
+                    key={index}
                     style={{
                       width: 40,
                       height: 40,
@@ -289,34 +320,41 @@ const NewBetScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                       }}
                       style={{ position: "absolute", top: 4, right: 8 }}
                     >
-                      <Text style={{ fontSize: 10 }}>x</Text>
+                      <Text style={{ fontSize: 10, color: "white" }}>x</Text>
                     </TouchableOpacity>
                     <Text style={{ color: "white" }}>{item}</Text>
                   </View>
                 ))}
               </View>
               <BottomButtonsRow>
-                <BottomButton onClick={completeGame}>
-                  Complete game
+                <BottomButton onPress={completeGame}>
+                  <TextButton>Complete game</TextButton>
                 </BottomButton>
-                <BottomButton onClick={clearGame}>Clear game</BottomButton>
-                <AddButton onClick={addToCart}>
+                <BottomButton onPress={clearGame}>
+                  <TextButton>Clear game</TextButton>
+                </BottomButton>
+                <View>
+                  <AddButton onPress={addToCart}>
+                    <Text style={{ color: "white", marginRight: 5 }}>
+                      Add to cart
+                    </Text>
+                  </AddButton>
                   <MaterialCommunityIcons
                     name="cart-outline"
                     size={25}
-                    style={{ marginRight: "10px" }}
-                  />{" "}
-                  Add to cart
-                </AddButton>
+                    color="white"
+                    style={{ position: "absolute", top: 3, left: 5 }}
+                  />
+                </View>
               </BottomButtonsRow>
-            </>
+            </View>
           )}
           <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
             {generateBettingNumbers()}
           </View>
         </ScrollView>
       )}
-    </View>
+    </Container>
   );
 };
 

@@ -1,19 +1,65 @@
-import React from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ToastAndroid,
+} from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../store";
+import { RootState } from "../../store/";
 import BetInCart from "../BetInCart";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Game, saveGame } from "../../store/Games/gamesSlice";
+import axios from "axios";
+import { clear } from "../../store/Cart/cartSlice";
+import { clearGameCart } from "../../store/InfoCart/infoCartSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
 const Cart: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const dispatch = useDispatch();
-  const totalPrice = useSelector(
-    (state: RootState) => state.infoCart.totalPrice
-  );
-  const totalQtt = useSelector((state: RootState) => state.infoCart.totalQtt);
-  const cartfromStore = useSelector((state: RootState) => state.cart);
+  const dispatch = useAppDispatch();
+  const totalPrice = useAppSelector((state) => state.info.totalPrice);
+  const totalQtt = useAppSelector((state) => state.info.totalQtt);
+  const cartfromStore: Array<Game> = useAppSelector((state) => state.cart.bets);
+  console.log('chegou no cart:'+ cartfromStore)
+  const token = useSelector((state: RootState) => state.user.token);
 
+  const sendEmail = async () => {
+    await axios
+      .get("http://192.168.0.100:3333/send", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => {
+        console.log('ok deu certo');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const saveHandler = () => {
+    if (totalPrice >= 30) {
+      dispatch(saveGame(cartfromStore));
+
+      sendEmail();
+      dispatch(clear());
+      dispatch(clearGameCart());
+      navigation.navigate("App", { screen: "Home" });
+    } else {
+      return ToastAndroid.showWithGravityAndOffset(
+        "Spend more R$" +
+          (30 - totalPrice).toFixed(2) +
+          ". Minimum amount of R$30.00",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+        25,
+        50
+      );
+    }
+  };
   return (
     <View style={{ flex: 1 }}>
       <Feather
@@ -45,7 +91,7 @@ const Cart: React.FC<{ navigation: any }> = ({ navigation }) => {
         >
           CART
         </Text>
-        <label
+        <Text
           style={{
             borderRadius: 100,
             backgroundColor: "#f7f7f7",
@@ -55,17 +101,20 @@ const Cart: React.FC<{ navigation: any }> = ({ navigation }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: "2px 2px #CCC",
+            elevation: 2,
             marginTop: -5,
+            color: "#707070",
+            fontSize: 22,
+            fontWeight: "bold",
           }}
         >
           {totalQtt}
-        </label>
+        </Text>
       </View>
 
-      <View style={{ height:400 }}>
+      <View style={{ height: 400 }}>
         <ScrollView>
-          {cartfromStore &&
+          {cartfromStore.length !== 0 &&
             cartfromStore.map((item) => {
               return <BetInCart key={item.index} game={item} />;
             })}
@@ -119,12 +168,24 @@ const Cart: React.FC<{ navigation: any }> = ({ navigation }) => {
           )}
         </ScrollView>
       </View>
-      <View style={{flexDirection:'row', marginHorizontal:30, marginTop:10}}>
-        <Text style={{fontSize:15, fontWeight:'bold', color:'#707070'}}>
+      <View
+        style={{ flexDirection: "row", marginHorizontal: 30, marginTop: 10 }}
+      >
+        <Text style={{ fontSize: 15, fontWeight: "bold", color: "#707070" }}>
           CART
         </Text>
-        <Text style={{color:'#707070', fontSize:15}}> TOTAL: </Text>
-        <Text style={{position:'absolute', right:0, fontSize:15, fontWeight:'bold', color:'#707070'}}>{"R$ " + totalPrice.toFixed(2).replace('.',',')}</Text>
+        <Text style={{ color: "#707070", fontSize: 15 }}> TOTAL: </Text>
+        <Text
+          style={{
+            position: "absolute",
+            right: 0,
+            fontSize: 15,
+            fontWeight: "bold",
+            color: "#707070",
+          }}
+        >
+          {"R$ " + totalPrice.toFixed(2).replace(".", ",")}
+        </Text>
       </View>
       <TouchableOpacity
         style={{
@@ -137,6 +198,7 @@ const Cart: React.FC<{ navigation: any }> = ({ navigation }) => {
           alignItems: "center",
           justifyContent: "center",
         }}
+        onPress={saveHandler}
       >
         <Text style={{ fontSize: 30, color: "#B5C401", marginRight: 15 }}>
           Save

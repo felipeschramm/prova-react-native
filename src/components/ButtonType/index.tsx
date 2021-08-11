@@ -15,7 +15,7 @@ const ButtonType: React.FC<PropsButtonType> = (props) => {
 
   return (
     <ContainerButtonType
-      onClick={onClick}
+      onPress={onClick}
       bgColor={isClicked? game.color:'white'}
       bdColor={game.color}
     >

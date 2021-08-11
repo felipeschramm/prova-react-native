@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   Text,
   TouchableOpacity,
@@ -8,37 +8,34 @@ import {
   ToastAndroid,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { TextInput } from "react-native-gesture-handler";
-import { register } from "../../store/User/userSlice";
-import { RootState } from "../../store";
-import { login } from "../../store/User/userSlice";
 import axios from "axios";
+import { InputText, LineColor, TextTGL, ViewForm } from "./styles";
+import { login } from "../../store/User/userSlice";
 
 const AuthPage: React.FC<{ navigation: any }> = ({ navigation }) => {
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [typeText, setTypeText] = useState(true);
 
-  const loginHandler = async () => {
-    await axios
-      .post("http://localhost:3333/sessions", {
-        email:'felipecschramm@hotmail.com',
-        password: 'felipe123',
+  const loginHandler = () => {
+    axios
+      .post("http://192.168.0.100:3333/sessions", {
+        email: email,
+        password: password,
       })
-      ///////////////////////arrumar emsil:email, password:password
       .then((resp) => {
-        dispatch(login({ token: resp.data.token.toString() }));
+        dispatch(login({ token: resp.data.token.token.toString() }));
         navigation.navigate("App");
       })
       .catch((err) => {
-        // return ToastAndroid.showWithGravityAndOffset(
-        //   "User not registered",
-        //   ToastAndroid.SHORT,
-        //   ToastAndroid.BOTTOM,
-        //   25,
-        //   50
-        // );
+        return ToastAndroid.showWithGravityAndOffset(
+          "User not found",
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM,
+          25,
+          50
+        );
       });
   };
 
@@ -46,63 +43,33 @@ const AuthPage: React.FC<{ navigation: any }> = ({ navigation }) => {
     <View style={{ flex: 1 }}>
       <View style={{ width: "100%", alignItems: "center", marginTop: 100 }}>
         <View>
-          <Text
-            style={{
-              color: "#707070",
-              fontSize: 44,
-              fontWeight: "bold",
-              marginLeft: 8,
-            }}
-          >
-            TGL
-          </Text>
-          <View
-            style={{
-              width: 107,
-              height: 7,
-              backgroundColor: "#B5C401",
-              borderRadius: 6,
-              marginBottom: 46,
-            }}
-          />
+          <TextTGL>TGL</TextTGL>
+          <LineColor />
         </View>
         <Text style={[styles.greyTitle, { marginBottom: 26 }]}>
           Authentication
         </Text>
-        <View
-          style={{
-            width: 306,
-            height: 293,
-            marginBottom: 38,
-            borderWidth: 1,
-            borderColor: "#DDDDDD",
-            borderRadius: 15,
-          }}
-        >
-          <TextInput
+        <ViewForm>
+          <InputText
             onChangeText={(input) => setEmail(input)}
             placeholder="Email"
-            style={{
-              height: 70,
-              fontSize: 15,
-              color: "#9D9D9D",
-              borderBottomColor: "#EBEBEB",
-              borderBottomWidth: 1,
-              paddingLeft: 26,
-              fontWeight: "bold",
-            }}
           />
-          <TextInput
+          <InputText
+            secureTextEntry={typeText}
             onChangeText={(input) => setPassword(input)}
             placeholder="Password"
+          />
+          <Feather
+            name="eye"
+            color="#B5C401"
+            size={30}
             style={{
-              height: 70,
-              fontSize: 15,
-              color: "#9D9D9D",
-              borderBottomColor: "#EBEBEB",
-              borderBottomWidth: 1,
-              paddingLeft: 26,
-              fontWeight: "bold",
+              position: "absolute",
+              top: 90,
+              right: 40,
+            }}
+            onPress={() => {
+              setTypeText((prevState: boolean) => !prevState);
             }}
           />
           <View style={{ flex: 1 }}>
@@ -111,6 +78,9 @@ const AuthPage: React.FC<{ navigation: any }> = ({ navigation }) => {
                 position: "absolute",
                 top: 25,
                 right: 31,
+              }}
+              onPress={() => {
+                navigation.navigate("Reset");
               }}
             >
               <Text
@@ -131,7 +101,7 @@ const AuthPage: React.FC<{ navigation: any }> = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </ViewForm>
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("Register");

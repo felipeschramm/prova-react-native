@@ -1,18 +1,23 @@
-import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./User/userSlice";
-import gamesReducer from "./Games/gamesSlice";
-import cartReducer from './Cart/cartSlice'
-import infoCartReducer from "./InfoCart/infoCartSlice";
+import {
+  combineReducers,
+  configureStore,
+  getDefaultMiddleware,
+} from "@reduxjs/toolkit";
+import cartSlice from "./Cart/cartSlice";
+import gamesSlice from "./Games/gamesSlice";
+import infoCartSlice from "./InfoCart/infoCartSlice";
+import userSlice from "./User/userSlice";
 
-const store = configureStore({
-  reducer: {
-    user: userReducer,
-    games: gamesReducer,
-    cart: cartReducer,
-    infoCart:infoCartReducer
-  },
+const rootReducer = combineReducers({
+  user: userSlice,
+  cart: cartSlice,
+  game: gamesSlice,
+  info: infoCartSlice,
+});
+
+export const store = configureStore({
+  reducer: rootReducer,
 });
 
 export type RootState = ReturnType<typeof store.getState>;
-
-export default store;
+export type AppDispatch = typeof store.dispatch;

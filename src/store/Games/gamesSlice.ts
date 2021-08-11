@@ -18,6 +18,7 @@ const games = createSlice({
   reducers: {
     saveGame(state, action: PayloadAction<Game[]>) {
       action.payload.forEach((item) => {
+        console.log(item.numbers)
         state.push(item);
       });
     },
